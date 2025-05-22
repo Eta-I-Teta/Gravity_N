@@ -1,0 +1,9 @@
+{
+    "size": {
+        "height": 600,
+        "width": 600
+    },
+    "scale": 1e6,
+    "frequency_updating": 0.05,
+    "time_speed": 10e7
+}
