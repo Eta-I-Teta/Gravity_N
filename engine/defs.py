@@ -45,8 +45,8 @@ def averaging_vector(data: list) -> list:
     
     return average_vector
 
-def acceleration_calculation(space: list, config_consts = config_consts):
-    G = config_consts["G"]
+def acceleration_calculation(space: list, config: json = config_consts):
+    G = config["G"]
 
     for modified_object in space:
         acceleration_data = []
@@ -63,14 +63,28 @@ def acceleration_calculation(space: list, config_consts = config_consts):
         
         modified_object.acceleration = averaging_vector(acceleration_data)
 
-def speed_calculation(space: list, config = config_display):
+def speed_calculation(space: list, time_speed: float = 1, config: json = config_display):
     for modified_object in space:
 
-        modified_object.speed[0] += modified_object.acceleration[0] * config["frequency_updating"] * config["time_speed"] 
-        modified_object.speed[1] += modified_object.acceleration[1] * config["frequency_updating"] * config["time_speed"]
+        modified_object.speed[0] += modified_object.acceleration[0] * config["frequency_updating"] * time_speed
+        modified_object.speed[1] += modified_object.acceleration[1] * config["frequency_updating"] * time_speed
 
-def coordinates_calculation(space: list, config = config_display):
+def coordinates_calculation(space: list, time_speed: float = 1, config: json = config_display):
     for modified_object in space:
 
-        modified_object.coordinates[0] += modified_object.speed[0] * config["frequency_updating"] * config["time_speed"] 
-        modified_object.coordinates[1] += modified_object.speed[1] * config["frequency_updating"] * config["time_speed"]
+        modified_object.coordinates[0] += modified_object.speed[0] * config["frequency_updating"] * time_speed
+        modified_object.coordinates[1] += modified_object.speed[1] * config["frequency_updating"] * time_speed
+
+def get_coordinates_center_mass(space: list) -> list:
+    coordinates_center_mass = [0, 0]
+    total_mass = 0
+
+    for i in space:
+        coordinates_center_mass[0] += i.coordinates[0] * i.mass
+        coordinates_center_mass[1] += i.coordinates[1] * i.mass
+        total_mass += i.mass
+    
+    coordinates_center_mass[0] /= total_mass
+    coordinates_center_mass[1] /= total_mass
+
+    return coordinates_center_mass
