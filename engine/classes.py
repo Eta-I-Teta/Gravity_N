@@ -31,6 +31,6 @@ class SpaceObject:
         x_coordinates_for_screen = ( ( self.coordinates[0] - center_coordinates[0] ) / config["scale"] ) + ( config["size"]["width"] / 2 )
         y_coordinates_for_screen = ( ( self.coordinates[1] - center_coordinates[1] ) / config["scale"] ) + ( config["size"]["height"] / 2 )
 
-        radius = self.radius / config["scale"]
+        radius = self.radius / config["scale"] * config["planet_radius_multiplier"]
 
         pygame.draw.circle(screen, self.color, [x_coordinates_for_screen, y_coordinates_for_screen], radius)

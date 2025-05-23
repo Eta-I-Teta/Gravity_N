@@ -1,8 +1,9 @@
 {
     "size": {
-        "height": 600,
-        "width": 600
+        "height": 750,
+        "width": 1000
     },
-    "scale": 5e5,
+    "scale": 2e6,
+    "planet_radius_multiplier": 10,
     "frequency_updating": 0.02
 }

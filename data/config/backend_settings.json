@@ -1,0 +1,3 @@
+{
+    "SpaceObject_attributes": ["name", "mass", "radius", "color", "coordinates", "speed"]
+}

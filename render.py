@@ -4,18 +4,19 @@ import json
 import pygame
 import time
 
+pygame.init()
+
 with open("data/config/display.json", "r", encoding="utf-8") as f:
     config_display = json.load(f)
 
-pygame.init()
-
 screen = pygame.display.set_mode((config_display["size"]["width"], config_display["size"]["height"]))
+pygame.display.set_caption("Модель космической системы")
 
-earth = SpaceObject(name="EARTH", radius=5e6, color=(100, 255, 100), coordinates=[0, 0], mass=6e24)
-moon = SpaceObject(name="MOON", radius=5e6, color=(255, 255, 255), coordinates=[100e6, 0], mass=7e22, speed=[0, 2])
+earth = SpaceObject(name="EARTH", radius=5e6, color=[150, 255, 150], coordinates=[0, 0], mass=6e24)
+moon = SpaceObject(name="MOON", radius=7e6, color=(255, 255, 255), coordinates=[100e6, 0], mass=7e22, speed=[0, 2])
 
-space = [earth, moon]
-time_speed = 5e7
+space = set_space_configuration("planet_system.json")
+time_speed = 5e8
 
 while True:
     for event in pygame.event.get():
@@ -28,12 +29,14 @@ while True:
     speed_calculation(space, time_speed = time_speed)
     coordinates_calculation(space, time_speed = time_speed)
 
-    screen_coordinates = get_coordinates_center_mass(space)
+    coordinates_frame_reference = get_coordinates_center_mass(space)
+    
     for i in space:
-        i.draw(screen, center_coordinates = screen_coordinates)
+        i.draw(screen, center_coordinates = coordinates_frame_reference)
     
     
     pygame.display.flip()
+
     time.sleep(config_display["frequency_updating"])
 
 pygame.quit()

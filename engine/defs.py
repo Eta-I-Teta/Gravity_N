@@ -5,6 +5,8 @@ with open("data/config/consts.json", "r", encoding="utf-8") as f:
     config_consts = json.load(f)
 with open("data/config/display.json", "r", encoding="utf-8") as f:
     config_display = json.load(f)
+with open("data/config/backend_settings.json", "r", encoding="utf-8") as f:
+    config_backend_settings = json.load(f)
 
 def distance(obj_1: SpaceObject, obj_2: SpaceObject) -> float:
     return ((obj_1.coordinates[0] - obj_2.coordinates[0]) ** 2 + (obj_1.coordinates[1] - obj_2.coordinates[1]) ** 2) ** 0.5
@@ -88,3 +90,20 @@ def get_coordinates_center_mass(space: list) -> list:
     coordinates_center_mass[1] /= total_mass
 
     return coordinates_center_mass
+
+def set_space_configuration(file_name: str, config_attributes: list = config_backend_settings["SpaceObject_attributes"]) -> list:
+
+    with open("data/config/" + file_name, "r", encoding="utf-8") as f:
+        config = json.load(f)
+    
+    space = []
+
+    for index in range(len(config)):
+        space.append( SpaceObject() )
+        for attribute in config_attributes:
+            if hasattr(space[index], attribute):
+                setattr(space[index], attribute, config[str(index)][attribute])
+            else:
+                print("ERROR")
+    
+    return space
