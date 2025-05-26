@@ -1,5 +1,5 @@
 from engine.classes import *
-from engine.defs import *
+from engine.utilities import *
 import json
 
 if __name__ == "__main__":
@@ -8,6 +8,4 @@ if __name__ == "__main__":
 
     #demo
     pass
-
-    # todo
-    # implement project
+print(distance(SpaceObject(coordinates=[1, 80]), SpaceObject()))

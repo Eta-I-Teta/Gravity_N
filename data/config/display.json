@@ -1,9 +1,12 @@
 {
-    "size": {
-        "height": 750,
-        "width": 1000
-    },
-    "scale": 2e6,
-    "planet_radius_multiplier": 10,
-    "frequency_updating": 0.02
+    "render": {
+        "size": {
+            "height": 750,
+            "width": 1000
+        },
+        "scale": 2e6,
+        "planet_radius_multiplier": 10,
+        "frequency_updating": 0.02,
+        "camera_movement_speed": 2
+    }
 }

@@ -15,22 +15,3 @@ class SpaceObject:
         self.color = (255, 255, 255) if ( color == None ) else color
         
         pass
-    
-    def draw(self, screen, center_coordinates: list = None ,config: json = config_display):
-        """
-        Args:
-        screen - the screen where the SpaceObject will be drawn
-        center_coordinates - a pair of coordinates that should be in the center of the screen
-        config - configuration file
-
-        Do:
-        renders the SpaceObject according to the arguments
-        """
-        center_coordinates = [0, 0] if ( center_coordinates == None ) else center_coordinates
-
-        x_coordinates_for_screen = ( ( self.coordinates[0] - center_coordinates[0] ) / config["scale"] ) + ( config["size"]["width"] / 2 )
-        y_coordinates_for_screen = ( ( self.coordinates[1] - center_coordinates[1] ) / config["scale"] ) + ( config["size"]["height"] / 2 )
-
-        radius = self.radius / config["scale"] * config["planet_radius_multiplier"]
-
-        pygame.draw.circle(screen, self.color, [x_coordinates_for_screen, y_coordinates_for_screen], radius)
