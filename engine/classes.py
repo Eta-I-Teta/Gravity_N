@@ -1,6 +1,7 @@
 import json
 import pygame
 from engine.utilities import *
+from collections import deque
 
 with open("data/config/display.json", "r", encoding="utf-8") as f:
     config_display = json.load(f)
@@ -10,7 +11,7 @@ with open("data/config/backend_settings.json", "r", encoding="utf-8") as f:
     config_backend_settings = json.load(f)
 
 class SpaceObject:
-    def __init__(self, name: any = None, mass: float = None, coordinates: list = None, radius: float = None, speed: list = None, acceleration: list = None, color = None):
+    def __init__(self, name: any = None, mass: float = None, coordinates: list = None, radius: float = None, speed: list = None, acceleration: list = None, color = None, config = config_display["render"]):
         self.name = name
         self.mass = 1e3 if ( mass == None ) else mass
         self.coordinates = [0, 0] if ( coordinates == None ) else coordinates
@@ -18,6 +19,7 @@ class SpaceObject:
         self.speed = [0, 0] if ( speed == None ) else speed
         self.acceleration = [0, 0] if ( acceleration == None ) else acceleration
         self.color = (255, 255, 255) if ( color == None ) else color
+        self.trace = deque(maxlen = config["trace_lenght"])
         
         pass
 
@@ -49,10 +51,10 @@ def distance(obj_1: SpaceObject, obj_2: SpaceObject) -> float:
 
     return ((obj_1.coordinates[0] - obj_2.coordinates[0]) ** 2 + (obj_1.coordinates[1] - obj_2.coordinates[1]) ** 2) ** 0.5
 
-def draw(obj: SpaceObject, screen, center_coordinates: list, camera_shift: list, config: json = config_display["render"]):
+def draw_planet(obj: SpaceObject, screen, center_coordinates: list, camera_shift: list, scale: float, config = config_display["render"]):
     """
     Args:
-        obj: the object to be drawn (MUST HAVE A COORDINATES ATTRIBUTE)
+        obj (SpaceObject): the object to be drawn
         screen: the screen where the SpaceObject will be drawn
         center_coordinates (list): a pair of coordinates that should be in the center of the screen
         camera_shift (list): offset of the camera relative to the center
@@ -63,12 +65,32 @@ def draw(obj: SpaceObject, screen, center_coordinates: list, camera_shift: list,
     """
     center_coordinates = [0, 0] if ( center_coordinates == None ) else center_coordinates
 
-    x_coordinates_for_screen = ( ( obj.coordinates[0] - center_coordinates[0] ) / config["scale"] ) + ( config["size"]["width"] / 2 ) + camera_shift[0]
-    y_coordinates_for_screen = ( ( obj.coordinates[1] - center_coordinates[1] ) / config["scale"] ) + ( config["size"]["height"] / 2 ) + camera_shift[1]
+    x_coordinates_for_screen = ( ( obj.coordinates[0] - center_coordinates[0] ) / scale ) + ( config["size"]["width"] / 2 ) + camera_shift[0]
+    y_coordinates_for_screen = ( ( obj.coordinates[1] - center_coordinates[1] ) / scale ) + ( config["size"]["height"] / 2 ) + camera_shift[1]
 
-    radius = obj.radius / config["scale"] * config["planet_radius_multiplier"]
+    radius_for_screen = obj.radius / scale * config["planet_radius_multiplier"]
 
-    pygame.draw.circle(screen, obj.color, [x_coordinates_for_screen, y_coordinates_for_screen], radius)
+    pygame.draw.circle(screen, obj.color, [x_coordinates_for_screen, y_coordinates_for_screen], radius_for_screen)
+
+def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, scale: float, config = config_display["render"]):
+    """
+    Args:
+        obj (list): list of coordinate pairs of trace to be drawn
+        screen: the screen where the SpaceObject will be drawn
+        center_coordinates (list): a pair of coordinates that should be in the center of the screen
+        camera_shift (list): offset of the camera relative to the center
+        config (json): configuration file
+
+    Do:
+        renders the object according to the arguments
+    """
+    center_coordinates = [0, 0] if ( center_coordinates == None ) else center_coordinates
+
+    for dots_coordinates in obj:
+        x_coordinates_for_screen = ( ( dots_coordinates[0] - center_coordinates[0] ) / scale ) + ( config["size"]["width"] / 2 ) + camera_shift[0]
+        y_coordinates_for_screen = ( ( dots_coordinates[1] - center_coordinates[1] ) / scale ) + ( config["size"]["height"] / 2 ) + camera_shift[1]
+
+        pygame.draw.circle(screen, config["trace_color"], [x_coordinates_for_screen, y_coordinates_for_screen], config["trace_size"])
 
 class OuterSpace:
     def __init__(self, planets: list = None):
@@ -104,6 +126,10 @@ class OuterSpace:
             modified_object.coordinates[0] += modified_object.speed[0] * config["frequency_updating"] * time_speed
             modified_object.coordinates[1] += modified_object.speed[1] * config["frequency_updating"] * time_speed
     
+    def trace_calculation(self):
+        for planet in self.planets:
+            planet.trace.append(list(planet.coordinates))
+
     def get_coordinates_center_mass(self) -> list:
         coordinates_center_mass = [0, 0]
         total_mass = 0

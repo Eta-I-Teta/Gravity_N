@@ -25,6 +25,10 @@ time_speed = 5e8
 
 camera_shift = [0, 0]
 camera_movement_speed = config_display["render"]["camera_movement_speed"]
+camera_scale = config_display["render"]["scale"]
+
+trace_rendering = True
+trace_lenght = config_display["render"]["trace_lenght"]
 
 # Program processes
 
@@ -41,6 +45,13 @@ while True:
         if event.type == pygame.KEYDOWN:
             if (event.key == pygame.K_r):
                 camera_shift = [0, 0]
+            if (event.key == pygame.K_t):
+                if trace_rendering:
+                    trace_rendering = False
+                    for planet in space.planets:
+                        planet.trace.clear()
+                else:
+                    trace_rendering = True
         
     # Handling key retention
 
@@ -54,11 +65,13 @@ while True:
     if pressed_keys[pygame.K_d]:
         camera_shift[0] -= camera_movement_speed
     
-    # Coordinates calculation
+    # Calculation
 
     space.acceleration_calculation()
     space.speed_calculation(time_speed = time_speed)
     space.coordinates_calculation(time_speed = time_speed)
+    if trace_rendering:
+        space.trace_calculation()
 
     coordinates_frame_reference = space.get_coordinates_center_mass()
     
@@ -66,9 +79,10 @@ while True:
 
     screen.fill((0, 0, 0))
 
-    for i in space.planets:
-        draw(i, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift)
-    
+    for planet in space.planets:
+        draw_planet(planet, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
+        if trace_rendering:
+            draw_trace(planet.trace, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
     pygame.display.flip()
 
     time.sleep(config_display["render"]["frequency_updating"])

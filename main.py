@@ -1,6 +1,6 @@
 from engine.classes import *
 from engine.utilities import *
-import json
+from collections import deque
 
 if __name__ == "__main__":
     #argparse
@@ -8,4 +8,8 @@ if __name__ == "__main__":
 
     #demo
     pass
-print(distance(SpaceObject(coordinates=[1, 80]), SpaceObject()))
+l = deque(maxlen=5)
+for i in range(10):
+    l.append([i, i])
+for i in l:
+    print(i)
