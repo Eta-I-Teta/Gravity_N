@@ -1,4 +1,4 @@
-from engine.classes import SpaceObject
+from engine.classes import *
 from engine.utilities import *
 import json
 import pygame
@@ -19,7 +19,8 @@ pygame.display.set_caption("Модель космической системы")
 
 # Configurate and other settings
 
-space = set_space_configuration("planet_system.json")
+space = OuterSpace()
+space.set_planet_system_configuration("planet_system.json")
 time_speed = 5e8
 
 camera_shift = [0, 0]
@@ -55,17 +56,17 @@ while True:
     
     # Coordinates calculation
 
-    acceleration_calculation(space)
-    speed_calculation(space, time_speed = time_speed)
-    coordinates_calculation(space, time_speed = time_speed)
+    space.acceleration_calculation()
+    space.speed_calculation(time_speed = time_speed)
+    space.coordinates_calculation(time_speed = time_speed)
 
-    coordinates_frame_reference = get_coordinates_center_mass(space)
+    coordinates_frame_reference = space.get_coordinates_center_mass()
     
     # Drawing
 
     screen.fill((0, 0, 0))
 
-    for i in space:
+    for i in space.planets:
         draw(i, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift)
     
     pygame.display.flip()

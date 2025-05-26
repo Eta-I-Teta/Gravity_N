@@ -1,5 +1,4 @@
 from engine.utilities import averaging_vector
-from engine.classes import *
 
 def test_averaging_vector_1():
     inp_vector = [[4, 3], [3, 4]]
