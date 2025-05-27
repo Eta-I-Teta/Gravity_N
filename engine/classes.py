@@ -23,34 +23,6 @@ class SpaceObject:
         
         pass
 
-def distance(obj_1: SpaceObject, obj_2: SpaceObject) -> float:
-    """
-    Args:
-        obj_1 (SpaceObject): first object, between which the distance will be calculated
-        obj_2 (SpaceObject): second object, between which the distance will be calculated
-
-    Returns:
-        distance between objects
-    """
-    if ( not (type(obj_1) is SpaceObject) ) or ( not (type(obj_2) is SpaceObject) ):
-        raise TypeError("Arguments of the SpaceObject type are expected")
-    
-    if ( not hasattr(obj_1, "coordinates") ) or ( not hasattr(obj_2, "coordinates") ):
-        raise KeyError("The coordinates attribute was not found for the objects")
-    
-    if (
-        ( ( len(obj_1.coordinates) != 2 ) or ( len(obj_2.coordinates) != 2 ) ) or
-        ( (not (type(obj_1.coordinates[0]) is float)) and (not (type(obj_1.coordinates[0]) is int)) ) or
-        ( (not (type(obj_1.coordinates[1]) is float)) and (not (type(obj_1.coordinates[1]) is int)) ) or
-        ( (not (type(obj_2.coordinates[0]) is float)) and (not (type(obj_2.coordinates[0]) is int)) ) or
-        ( (not (type(obj_2.coordinates[1]) is float)) and (not (type(obj_2.coordinates[1]) is int)) )
-    ):
-        raise ValueError("Incorrect coordinate value")
-
-
-
-    return ((obj_1.coordinates[0] - obj_2.coordinates[0]) ** 2 + (obj_1.coordinates[1] - obj_2.coordinates[1]) ** 2) ** 0.5
-
 def draw_planet(obj: SpaceObject, screen, center_coordinates: list, camera_shift: list, scale: float, config = config_display["render"]):
     """
     Args:
@@ -108,7 +80,7 @@ class OuterSpace:
                     direction = [cursor_object.coordinates[0] - modified_object.coordinates[0], cursor_object.coordinates[1] - modified_object.coordinates[1]]
                     direction = normalize_vector(direction)
 
-                    value = G * cursor_object.mass / ( distance(modified_object, cursor_object) ** 2 )
+                    value = G * cursor_object.mass / ( distance(modified_object.coordinates, cursor_object.coordinates) ** 2 )
 
                     acceleration_data.append(product_vector_scalar(value, direction))
             
@@ -160,3 +132,21 @@ class OuterSpace:
                     raise AttributeError("The config file contains unsupported attributes")
         
         self.planets = planet_system
+    
+    def get_normalized_scale(self, center_coordinates: list, multiplier: float = 0.75, config: json = config_display["render"]):
+
+        most_remote_planet = self.get_most_remote_planet(center_coordinates)
+
+        return max(abs(center_coordinates[0] - most_remote_planet.coordinates[0]) * 2 / (config["size"]["width"] * multiplier), 
+                   abs(center_coordinates[1] - most_remote_planet.coordinates[1]) * 2 / (config["size"]["height"] * multiplier))
+
+    def get_most_remote_planet(self, center_coordinates) -> SpaceObject:
+        max_distance = 0
+        most_remote_planet = self.planets[0]
+
+        for planet in self.planets:
+            if distance(center_coordinates, planet.coordinates) > max_distance:
+                max_distance = distance(center_coordinates, planet.coordinates)
+                most_remote_planet = planet
+        
+        return most_remote_planet

@@ -2,14 +2,23 @@
     "render": {
         "size": {
             "height": 750,
-            "width": 1000
+            "width": 750
         },
-        "scale": 2e6,
-        "planet_radius_multiplier": 10,
+        "FPS": 60,
+        "planet_radius_multiplier": 1,
         "frequency_updating": 0.02,
-        "camera_movement_speed": 2,
-        "trace_lenght": 250,
+        "camera_movement_speed": 5,
+        "scale_multiplier": 1.1,
+        "trace_lenght": 500,
         "trace_size": 1,
         "trace_color": [255, 255, 255]
+    },
+
+    "main":{
+        "size":{
+            "width": 500,
+            "height": 300
+        },
+        "FPS": 60
     }
 }

@@ -1,15 +1,39 @@
-from engine.classes import *
-from engine.utilities import *
-from collections import deque
+import pygame
+import time
+import json
+import subprocess
 
-if __name__ == "__main__":
-    #argparse
+pygame.init()
+
+with open("data/config/display.json", "r", encoding="utf-8") as f:
+    config_display = json.load(f)
+
+# Screen settings
+
+screen_width = config_display["main"]["size"]["width"]
+screen_height = config_display["main"]["size"]["height"]
+
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("main")
+
+while True:
+
+    # Events
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+    # Drawing
+
+    screen.fill((0, 0, 0))
+
     
+    pygame.display.flip()
 
-    #demo
-    pass
-l = deque(maxlen=5)
-for i in range(10):
-    l.append([i, i])
-for i in l:
-    print(i)
+    pygame.time.Clock().tick(config_display["main"]["FPS"])
+
+    
+    print("DO IT")
+    subprocess.run(["python", "render.py"])
+
+pygame.quit()

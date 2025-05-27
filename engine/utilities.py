@@ -32,6 +32,30 @@ def product_vector_scalar(scalar: float, vector: list) -> list:
     
     return output_vector
 
+def distance(obj_1: list, obj_2: list) -> float:
+    """
+    This function only for pair coordinates
+    Args:
+        obj_1 (list): first pair coordinates, between which the distance will be calculated
+        obj_2 (list): second pair coordinates, between which the distance will be calculated
+
+    Returns:
+        distance between objects
+    """
+    
+    if (
+        ( ( len(obj_1) != 2 ) or ( len(obj_2) != 2 ) ) or
+        ( (not (type(obj_1[0]) is float)) and (not (type(obj_1[0]) is int)) ) or
+        ( (not (type(obj_1[1]) is float)) and (not (type(obj_1[1]) is int)) ) or
+        ( (not (type(obj_2[0]) is float)) and (not (type(obj_2[0]) is int)) ) or
+        ( (not (type(obj_2[1]) is float)) and (not (type(obj_2[1]) is int)) )
+    ):
+        raise ValueError("Incorrect coordinate value")
+
+    result = max(1, ((obj_1[0] - obj_2[0]) ** 2 + (obj_1[1] - obj_2[1]) ** 2) ** 0.5)
+
+    return result
+
 def normalize_vector(vector: list) -> list:
     """
     Args:
