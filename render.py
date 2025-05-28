@@ -30,8 +30,10 @@ camera_movement_speed = config_display["render"]["camera_movement_speed"]
 camera_scale = space.get_normalized_scale(coordinates_frame_reference)
 camera_scale_multiplier = config_display["render"]["scale_multiplier"]
 
-paused = False
+font = pygame.font.Font(config_display["render"]["font_family"], config_display["render"]["font_size"])
 
+paused = False
+show_info = True
 trace_rendering = True
 trace_lenght = config_display["render"]["trace_lenght"]
 
@@ -62,6 +64,11 @@ while True:
                     paused = False
                 else:
                     paused = True
+            if (event.key == pygame.K_i):
+                if show_info:
+                    show_info = False
+                else:
+                    show_info = True
 
         # Wheel scrolling processing
 
@@ -109,6 +116,8 @@ while True:
         draw_planet(planet, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
         if trace_rendering:
             draw_trace(planet.trace, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
+        if show_info:
+            draw_info(planet, screen, font, scale=camera_scale, camera_shift=camera_shift, center_coordinates=coordinates_frame_reference)
 
     time.sleep(config_display["render"]["frequency_updating"])
     pygame.time.Clock().tick(config_display["render"]["FPS"])

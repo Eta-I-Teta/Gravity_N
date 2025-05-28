@@ -11,7 +11,12 @@
         "scale_multiplier": 1.1,
         "trace_lenght": 500,
         "trace_size": 1,
-        "trace_color": [255, 255, 255]
+        "trace_color": [255, 255, 255],
+        "font_family": null,
+        "font_size": 25,
+        "degree_rounding": 5,
+        "line_spacing": 3,
+        "text_color": [255, 255, 255]
     },
 
     "main":{

@@ -23,6 +23,12 @@ class SpaceObject:
         
         pass
 
+def get_coordinates_for_screen(coordinates: list, scale, camera_shift, center_coordinates, config = config_display["render"]):
+    screen_x = ( ( coordinates[0] - center_coordinates[0] ) / scale ) + ( config["size"]["width"] / 2 ) + camera_shift[0]
+    screen_y = ( ( coordinates[1] - center_coordinates[1] ) / scale ) + ( config["size"]["height"] / 2 ) + camera_shift[1]
+
+    return [screen_x, screen_y]
+
 def draw_planet(obj: SpaceObject, screen, center_coordinates: list, camera_shift: list, scale: float, config = config_display["render"]):
     """
     Args:
@@ -37,12 +43,11 @@ def draw_planet(obj: SpaceObject, screen, center_coordinates: list, camera_shift
     """
     center_coordinates = [0, 0] if ( center_coordinates == None ) else center_coordinates
 
-    x_coordinates_for_screen = ( ( obj.coordinates[0] - center_coordinates[0] ) / scale ) + ( config["size"]["width"] / 2 ) + camera_shift[0]
-    y_coordinates_for_screen = ( ( obj.coordinates[1] - center_coordinates[1] ) / scale ) + ( config["size"]["height"] / 2 ) + camera_shift[1]
+    coordinates_for_screen = get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)
 
     radius_for_screen = obj.radius / scale * config["planet_radius_multiplier"]
 
-    pygame.draw.circle(screen, obj.color, [x_coordinates_for_screen, y_coordinates_for_screen], radius_for_screen)
+    pygame.draw.circle(screen, obj.color, coordinates_for_screen, radius_for_screen)
 
 def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, scale: float, config = config_display["render"]):
     """
@@ -59,10 +64,19 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
     center_coordinates = [0, 0] if ( center_coordinates == None ) else center_coordinates
 
     for dots_coordinates in obj:
-        x_coordinates_for_screen = ( ( dots_coordinates[0] - center_coordinates[0] ) / scale ) + ( config["size"]["width"] / 2 ) + camera_shift[0]
-        y_coordinates_for_screen = ( ( dots_coordinates[1] - center_coordinates[1] ) / scale ) + ( config["size"]["height"] / 2 ) + camera_shift[1]
+        coordinates_for_screen = get_coordinates_for_screen(dots_coordinates, scale, camera_shift, center_coordinates)
 
-        pygame.draw.circle(screen, config["trace_color"], [x_coordinates_for_screen, y_coordinates_for_screen], config["trace_size"])
+        pygame.draw.circle(screen, config["trace_color"], coordinates_for_screen, config["trace_size"])
+
+def draw_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
+    lines = [f"Acceleration: {round(obj.acceleration[0], config['degree_rounding'])}, {round(obj.acceleration[1], config['degree_rounding'])}", 
+             f"Speed: {round(obj.speed[0], config['degree_rounding'])}, {round(obj.speed[1], config['degree_rounding'])}"]
+
+    for index_of_line, line in enumerate(lines):
+        coordinates_for_screen = get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)
+
+        text = font.render(line, True, config["text_color"])
+        screen.blit(text, [coordinates_for_screen[0], coordinates_for_screen[1] + index_of_line * (config["font_size"] + config["line_spacing"])] )
 
 class OuterSpace:
     def __init__(self, planets: list = None):
