@@ -129,7 +129,7 @@ while True:
         if trace_rendering:
             draw_trace(planet.trace, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
         if show_info:
-            draw_info(planet, screen, font, scale=camera_scale, camera_shift=camera_shift, center_coordinates=coordinates_frame_reference)
+            draw_info(planet, screen, font, scale=camera_scale, camera_shift=camera_shift, center_coordinates = coordinates_frame_reference)
 
     time.sleep(config_display["render"]["frequency_updating"])
     pygame.time.Clock().tick(config_display["render"]["FPS"])

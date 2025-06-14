@@ -70,6 +70,7 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
 
 def draw_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
     lines = [f"Name: {obj.name}",
+             f"Position: {round(obj.coordinates[0], config['degree_rounding'])}, {round(obj.coordinates[1], config['degree_rounding'])}",
              f"Speed: {round(obj.speed[0], config['degree_rounding'])}, {round(obj.speed[1], config['degree_rounding'])}"]
 
     for index_of_line, line in enumerate(lines):
@@ -79,8 +80,8 @@ def draw_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordi
         screen.blit(text, [coordinates_for_screen[0], coordinates_for_screen[1] + index_of_line * (config["font_size"] + config["line_spacing"])] )
 
 class OuterSpace:
-    def __init__(self, planets: list = None):
-        self.planets = [] if ( planets == None ) else planets
+    def __init__(self, planets: deque = None):
+        self.planets = deque() if ( planets == None ) else planets
     
     def acceleration_calculation(self, config: json = config_consts):
         G = config["G"]
@@ -135,7 +136,7 @@ class OuterSpace:
         with open("data/config/" + file_name, "r", encoding="utf-8") as f:
             config = json.load(f)
         
-        planet_system = []
+        planet_system = deque()
 
         for index in range(len(config)):
             planet_system.append( SpaceObject() )
