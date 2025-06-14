@@ -21,7 +21,11 @@ pygame.display.set_caption("Модель космической системы")
 
 space = OuterSpace()
 space.set_planet_system_configuration("standart_planet_system.json")
-time_speed = 5e8
+
+time_speed = 1
+min_time_speed = config_display["render"]["min_time_speed"]
+max_time_speed = config_display["render"]["max_time_speed"]
+time_multiplicity = config_display["render"]["time_multiplicity"]
 
 coordinates_frame_reference = space.get_coordinates_center_mass()
 
@@ -52,6 +56,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             if (event.key == pygame.K_r):
                 camera_shift = [0, 0]
+
             if (event.key == pygame.K_t):
                 if trace_rendering:
                     trace_rendering = False
@@ -59,16 +64,23 @@ while True:
                         planet.trace.clear()
                 else:
                     trace_rendering = True
+
             if (event.key == pygame.K_SPACE):
                 if paused:
                     paused = False
                 else:
                     paused = True
+
             if (event.key == pygame.K_i):
                 if show_info:
                     show_info = False
                 else:
                     show_info = True
+
+            if (event.key == pygame.K_UP) and (time_speed < max_time_speed):
+                time_speed *= time_multiplicity
+            if (event.key == pygame.K_DOWN) and (time_speed > min_time_speed):
+                time_speed /= time_multiplicity
 
         # Wheel scrolling processing
 

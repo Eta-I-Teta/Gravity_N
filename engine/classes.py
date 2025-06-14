@@ -69,12 +69,12 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
         pygame.draw.circle(screen, config["trace_color"], coordinates_for_screen, config["trace_size"])
 
 def draw_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
-    lines = [f"Acceleration: {round(obj.acceleration[0], config['degree_rounding'])}, {round(obj.acceleration[1], config['degree_rounding'])}", 
+    lines = [f"Name: {obj.name}",
              f"Speed: {round(obj.speed[0], config['degree_rounding'])}, {round(obj.speed[1], config['degree_rounding'])}"]
 
     for index_of_line, line in enumerate(lines):
         coordinates_for_screen = get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)
-
+        
         text = font.render(line, True, config["text_color"])
         screen.blit(text, [coordinates_for_screen[0], coordinates_for_screen[1] + index_of_line * (config["font_size"] + config["line_spacing"])] )
 
