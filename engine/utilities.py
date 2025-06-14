@@ -125,3 +125,22 @@ def averaging_vector(data: list) -> list:
         average_vector.append(tmp)
     
     return average_vector
+
+def get_beautiful_number(num: int) -> str:
+    if num == abs(num):
+        sgn = 1
+    else:
+        num = abs(num)
+        sgn = -1
+
+    k = 0
+    while num < 1:
+        num *= 10
+        k -=1
+    while num > 10:
+        num /= 10
+        k+=1
+    
+    num = round(num, 6)
+
+    return str(sgn * num) + f"e{k}"

@@ -2,6 +2,7 @@ import json
 import pygame
 from engine.utilities import *
 from collections import deque
+from engine.GUI import *
 
 with open("data/config/display.json", "r", encoding="utf-8") as f:
     config_display = json.load(f)
@@ -45,7 +46,7 @@ def draw_planet(obj: SpaceObject, screen, center_coordinates: list, camera_shift
 
     coordinates_for_screen = get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)
 
-    radius_for_screen = obj.radius / scale * config["planet_radius_multiplier"]
+    radius_for_screen = obj.radius / scale
 
     pygame.draw.circle(screen, obj.color, coordinates_for_screen, radius_for_screen)
 
@@ -69,18 +70,15 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
         pygame.draw.circle(screen, config["trace_color"], coordinates_for_screen, config["trace_size"])
 
 def draw_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
-    lines = [f"Name: {obj.name}",
-             f"Position: {round(obj.coordinates[0], config['degree_rounding'])}, {round(obj.coordinates[1], config['degree_rounding'])}",
-             f"Speed: {round(obj.speed[0], config['degree_rounding'])}, {round(obj.speed[1], config['degree_rounding'])}"]
-
-    for index_of_line, line in enumerate(lines):
-        coordinates_for_screen = get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)
-        
-        text = font.render(line, True, config["text_color"])
-        screen.blit(text, [coordinates_for_screen[0], coordinates_for_screen[1] + index_of_line * (config["font_size"] + config["line_spacing"])] )
+    MultilineText(
+        f"Name: {obj.name} \n" \
+        f"Position: {get_beautiful_number(obj.coordinates[0])}, {get_beautiful_number(obj.coordinates[1])} \n" \
+        f"Speed: {get_beautiful_number(obj.speed[0])}, {get_beautiful_number(obj.speed[1])}",
+        font
+    ).draw(screen, get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)[0], get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)[1], 300)
 
 class OuterSpace:
-    def __init__(self, planets: deque = None):
+    def __init__(self, planets: deque = None, center_mass: list = None):
         self.planets = deque() if ( planets == None ) else planets
     
     def acceleration_calculation(self, config: json = config_consts):
@@ -133,7 +131,7 @@ class OuterSpace:
 
     def set_planet_system_configuration(self, file_name: str, config_attributes: list = config_backend_settings["SpaceObject_attributes"]):
 
-        with open("data/config/" + file_name, "r", encoding="utf-8") as f:
+        with open(file_name, "r", encoding="utf-8") as f:
             config = json.load(f)
         
         planet_system = deque()

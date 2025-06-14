@@ -10,27 +10,31 @@
         "min_time_speed": 1e-9,
         "max_time_speed": 1e9,
 
-        "planet_radius_multiplier": 1,
         "frequency_updating": 0.02,
         "camera_movement_speed": 7,
         "scale_multiplier": 1.1,
 
-        "trace_lenght": 500,
+        "trace_lenght": 1000,
         "trace_size": 1,
         "trace_color": [255, 255, 255],
 
-        "font_family": null,
-        "font_size": 25,
-        "degree_rounding": 5,
-        "line_spacing": 1.5,
-        "text_color": [255, 255, 255]
+        "help":{
+            "size": {
+                "height": 550,
+                "width": 350
+            },
+            "background_color": [5, 5, 5]
+        }
     },
 
     "main":{
         "size":{
-            "width": 500,
-            "height": 300
+            "width": 750,
+            "height": 500
         },
-        "FPS": 60
+        "FPS": 60,
+
+        "font_family": "data/fonts/dehinted-Font_1.ttf",
+        "font_size": 30
     }
 }

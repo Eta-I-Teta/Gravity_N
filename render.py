@@ -1,5 +1,6 @@
 from engine.classes import *
 from engine.utilities import *
+from engine.GUI import *
 import json
 import pygame
 import time
@@ -16,28 +17,31 @@ screen_height = config_display["render"]["size"]["height"]
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Модель космической системы")
+pygame.display.set_icon(pygame.image.load('data/images/render_icon.png'))
 
 # Configurate and other settings
 
 space = OuterSpace()
-space.set_planet_system_configuration("standart_planet_system.json")
+space.set_planet_system_configuration("data/config/standart_planet_system.json")
 
 time_speed = 1
 min_time_speed = config_display["render"]["min_time_speed"]
 max_time_speed = config_display["render"]["max_time_speed"]
 time_multiplicity = config_display["render"]["time_multiplicity"]
 
-coordinates_frame_reference = space.get_coordinates_center_mass()
+coordinates_frame_reference = [0, 0]
+camera_anchor = -2
 
 camera_shift = [0, 0]
 camera_movement_speed = config_display["render"]["camera_movement_speed"]
 camera_scale = space.get_normalized_scale(coordinates_frame_reference)
 camera_scale_multiplier = config_display["render"]["scale_multiplier"]
 
-font = pygame.font.Font(config_display["render"]["font_family"], config_display["render"]["font_size"])
+font = pygame.font.SysFont(config_GUI["font_family"], config_GUI["font_size"])
 
 paused = False
-show_info = True
+show_info = False
+show_help = False
 trace_rendering = True
 trace_lenght = config_display["render"]["trace_lenght"]
 
@@ -76,11 +80,28 @@ while True:
                     show_info = False
                 else:
                     show_info = True
+            
+            if (event.key == pygame.K_ESCAPE):
+                if show_help:
+                    show_help = False
+                else:
+                    show_help = True
 
             if (event.key == pygame.K_UP) and (time_speed < max_time_speed):
                 time_speed *= time_multiplicity
             if (event.key == pygame.K_DOWN) and (time_speed > min_time_speed):
                 time_speed /= time_multiplicity
+
+            if (event.key == pygame.K_RIGHT):
+                if camera_anchor == len(space.planets) - 1:
+                    camera_anchor = -2
+                else:
+                    camera_anchor += 1
+            if (event.key == pygame.K_LEFT):
+                if camera_anchor == -2:
+                    camera_anchor = len(space.planets) - 1
+                else:
+                    camera_anchor -= 1
 
         # Wheel scrolling processing
 
@@ -108,6 +129,7 @@ while True:
     if pressed_keys[pygame.K_d]:
         camera_shift[0] -= camera_movement_speed
     
+
     if not paused:
 
         # Calculation
@@ -122,7 +144,12 @@ while True:
 
     screen.fill((0, 0, 0))
 
-    coordinates_frame_reference = space.get_coordinates_center_mass()
+    if camera_anchor == -2:
+        coordinates_frame_reference = [0, 0]
+    elif camera_anchor == -1:
+        coordinates_frame_reference = space.get_coordinates_center_mass()
+    else:
+        coordinates_frame_reference = space.planets[camera_anchor].coordinates
 
     for planet in space.planets:
         draw_planet(planet, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
@@ -130,6 +157,22 @@ while True:
             draw_trace(planet.trace, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
         if show_info:
             draw_info(planet, screen, font, scale=camera_scale, camera_shift=camera_shift, center_coordinates = coordinates_frame_reference)
+
+    if show_help:
+        MultilineText(
+            "Управление (ESC - выйти) \n" \
+            "WASD - перемещение камеры \n" \
+            "R - вернуться к отслеживаему объекту \n" \
+            "T - вкл/выкл отрисовку следа \n" \
+            "Пробел - пауза \n" \
+            "I - вкл/выкл показывание информации \n" \
+            "Стрелка вверх/вниз - ускорить/замедлить течение времени \n" \
+            "Стрелка вправо/влево - сменить отслеживаемый объект \n" \
+            "Крутить колёсико мыши - управление масштабом \n" \
+            "Нажатие на колёсико мыши - нормализация масштаба",
+            font
+        ).draw(screen, 50, 50, width = 500)
+        
 
     time.sleep(config_display["render"]["frequency_updating"])
     pygame.time.Clock().tick(config_display["render"]["FPS"])

@@ -1,0 +1,10 @@
+{
+    "text_color": [255, 255, 255],
+    "font_size": 25,
+    "line_spacing": 1.25,
+    "font_family": "data/fonts/dehinted-Font_1.ttf",
+
+    "border_radius": 10,
+    "background_color": [15, 15, 15],
+    "padding": 15
+}
