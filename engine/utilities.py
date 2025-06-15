@@ -126,6 +126,38 @@ def averaging_vector(data: list) -> list:
     
     return average_vector
 
+def not_zero(num: int):
+    return max(1e-18, num)
+
+def time_converter(num: int) -> str:
+    century = 0
+    while num > 60*60*24*365*100:
+        num -= 60*60*24*365*100
+        century += 1
+
+    year = 0
+    while num > 60*60*24*365:
+        num -= 60*60*24*365
+        year += 1
+
+    day = 0
+    while num > 60*60*24:
+        num -= 60*60*24
+        day += 1
+
+    hour = 0
+    while num > 60*60:
+        num -= 60*60
+        hour += 1
+
+    minute = 0
+    while num > 60:
+        num -= 60
+        minute += 1
+    second = round(num, 3)
+
+    return f"{century} в. {year} лет {day} д. {hour} ч. {minute} мин. {second} с."
+
 def get_beautiful_number(num: int) -> str:
     if num == abs(num):
         sgn = 1
@@ -137,7 +169,7 @@ def get_beautiful_number(num: int) -> str:
     while num < 1:
         num *= 10
         k -=1
-    while num > 10:
+    while num >= 10:
         num /= 10
         k+=1
     

@@ -2,7 +2,7 @@
     "render": {
         "size": {
             "height": 750,
-            "width": 750
+            "width": 1250
         },
         "FPS": 60,
         
@@ -13,18 +13,11 @@
         "frequency_updating": 0.02,
         "camera_movement_speed": 7,
         "scale_multiplier": 1.1,
+        "normal_scale_multiplier": 0.75,
 
         "trace_lenght": 1000,
         "trace_size": 1,
-        "trace_color": [255, 255, 255],
-
-        "help":{
-            "size": {
-                "height": 550,
-                "width": 350
-            },
-            "background_color": [5, 5, 5]
-        }
+        "trace_color": [255, 255, 255]
     },
 
     "main":{

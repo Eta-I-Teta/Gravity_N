@@ -25,7 +25,7 @@ class Button():
                 self.action()
                 return True
         return False
-    
+
 class MultilineText():
     def __init__(self, text, font):
         self.text = text
@@ -45,3 +45,18 @@ class MultilineText():
             text_surface = self.font.render(line, True, config["text_color"])
             surface.blit(text_surface, (x_pos + config["padding"], y_pos + config["padding"]))
             y_pos += config["font_size"] * config["line_spacing"]
+
+def draw_text(surface, text, font, x_pos, y_pos, width, config = config_GUI):
+    lines = text.split("\n")
+    height = (config["line_spacing"] * (len(lines) - 1) + 1) * config["font_size"]
+
+    pygame.draw.rect(
+        surface, 
+        config["background_color"], 
+        (x_pos, y_pos, width + 2 * config["padding"], height + 2 * config["padding"])
+    )
+
+    for line in lines:
+        text_surface = font.render(line, True, config["text_color"])
+        surface.blit(text_surface, (x_pos + config["padding"], y_pos + config["padding"]))
+        y_pos += config["font_size"] * config["line_spacing"]

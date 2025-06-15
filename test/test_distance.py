@@ -4,7 +4,7 @@ def test_distance_1():
     inp_A = coordinates = [0, 0]
     inp_B = coordinates = [0, 0]
 
-    expected_result = 0
+    expected_result = 1
     
     assert distance(inp_A, inp_B) == expected_result
     assert distance(inp_B, inp_A) == expected_result

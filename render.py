@@ -3,12 +3,13 @@ from engine.utilities import *
 from engine.GUI import *
 import json
 import pygame
-import time
 
 pygame.init()
 
 with open("data/config/display.json", "r", encoding="utf-8") as f:
     config_display = json.load(f)
+with open("data/config/help_info.json", "r", encoding="utf-8") as f:
+    config_help_info = json.load(f)
 
 # Screen settings
 
@@ -24,6 +25,7 @@ pygame.display.set_icon(pygame.image.load('data/images/render_icon.png'))
 space = OuterSpace()
 space.set_planet_system_configuration("data/config/standart_planet_system.json")
 
+total_time = 0
 time_speed = 1
 min_time_speed = config_display["render"]["min_time_speed"]
 max_time_speed = config_display["render"]["max_time_speed"]
@@ -70,22 +72,13 @@ while True:
                     trace_rendering = True
 
             if (event.key == pygame.K_SPACE):
-                if paused:
-                    paused = False
-                else:
-                    paused = True
+                paused = not paused
 
             if (event.key == pygame.K_i):
-                if show_info:
-                    show_info = False
-                else:
-                    show_info = True
+                show_info = not show_info
             
             if (event.key == pygame.K_ESCAPE):
-                if show_help:
-                    show_help = False
-                else:
-                    show_help = True
+                show_help = not show_help
 
             if (event.key == pygame.K_UP) and (time_speed < max_time_speed):
                 time_speed *= time_multiplicity
@@ -134,11 +127,10 @@ while True:
 
         # Calculation
 
-        space.acceleration_calculation()
-        space.speed_calculation(time_speed = time_speed)
-        space.coordinates_calculation(time_speed = time_speed)
+        space.planets_move_calculation_Euler(time_speed = time_speed)
         if trace_rendering:
             space.trace_calculation()
+        total_time += time_speed * config_display["render"]["frequency_updating"]
         
     # Drawing
 
@@ -146,35 +138,41 @@ while True:
 
     if camera_anchor == -2:
         coordinates_frame_reference = [0, 0]
+        anchor_name = "начало координат"
     elif camera_anchor == -1:
         coordinates_frame_reference = space.get_coordinates_center_mass()
+        anchor_name = "центр масс"
     else:
         coordinates_frame_reference = space.planets[camera_anchor].coordinates
+        anchor_name = space.planets[camera_anchor].name
 
     for planet in space.planets:
         draw_planet(planet, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
         if trace_rendering:
             draw_trace(planet.trace, screen, center_coordinates = coordinates_frame_reference, camera_shift = camera_shift, scale = camera_scale)
         if show_info:
-            draw_info(planet, screen, font, scale=camera_scale, camera_shift=camera_shift, center_coordinates = coordinates_frame_reference)
+            draw_planet_info(planet, screen, font, scale=camera_scale, camera_shift=camera_shift, center_coordinates = coordinates_frame_reference)
+
+    MultilineText(
+        f"Времени прошло: {time_converter(total_time)} \n" \
+        f"Скорость времени: {get_beautiful_number(time_speed)}x \n" \
+        f"Отслеживаемый объект: {anchor_name}",
+        font
+        ).draw(screen, 0, 0, 475)
 
     if show_help:
         MultilineText(
-            "Управление (ESC - выйти) \n" \
-            "WASD - перемещение камеры \n" \
-            "R - вернуться к отслеживаему объекту \n" \
-            "T - вкл/выкл отрисовку следа \n" \
-            "Пробел - пауза \n" \
-            "I - вкл/выкл показывание информации \n" \
-            "Стрелка вверх/вниз - ускорить/замедлить течение времени \n" \
-            "Стрелка вправо/влево - сменить отслеживаемый объект \n" \
-            "Крутить колёсико мыши - управление масштабом \n" \
-            "Нажатие на колёсико мыши - нормализация масштаба",
+            "\n".join(config_help_info["text"]), 
             font
-        ).draw(screen, 50, 50, width = 500)
+        ).draw(
+            screen, 
+            (config_display["render"]["size"]["width"] - config_help_info["width"]) / 2, 
+            50, 
+            config_help_info["width"]
+        )
         
 
-    time.sleep(config_display["render"]["frequency_updating"])
+    #time.sleep(config_display["render"]["frequency_updating"])
     pygame.time.Clock().tick(config_display["render"]["FPS"])
     
     pygame.display.flip()

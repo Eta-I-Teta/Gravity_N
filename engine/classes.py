@@ -69,7 +69,7 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
 
         pygame.draw.circle(screen, config["trace_color"], coordinates_for_screen, config["trace_size"])
 
-def draw_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
+def draw_planet_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
     MultilineText(
         f"Name: {obj.name} \n" \
         f"Position: {get_beautiful_number(obj.coordinates[0])}, {get_beautiful_number(obj.coordinates[1])} \n" \
@@ -81,7 +81,9 @@ class OuterSpace:
     def __init__(self, planets: deque = None, center_mass: list = None):
         self.planets = deque() if ( planets == None ) else planets
     
-    def acceleration_calculation(self, config: json = config_consts):
+    # Метод Эйлера
+
+    def acceleration_calculation_Euler(self, config: json = config_consts):
         G = config["G"]
 
         for modified_object in self.planets:
@@ -93,24 +95,30 @@ class OuterSpace:
                     direction = [cursor_object.coordinates[0] - modified_object.coordinates[0], cursor_object.coordinates[1] - modified_object.coordinates[1]]
                     direction = normalize_vector(direction)
 
-                    value = G * cursor_object.mass / ( distance(modified_object.coordinates, cursor_object.coordinates) ** 2 )
+                    value = G * cursor_object.mass / not_zero( distance(modified_object.coordinates, cursor_object.coordinates) ** 2 )
 
                     acceleration_data.append(product_vector_scalar(value, direction))
             
             modified_object.acceleration = averaging_vector(acceleration_data)
     
-    def speed_calculation(self, time_speed: float = 1, config: json = config_display["render"]):
+    def speed_calculation_Euler(self, time_speed: float = 1, config: json = config_display["render"]):
         for modified_object in self.planets:
 
             modified_object.speed[0] += modified_object.acceleration[0] * config["frequency_updating"] * time_speed
             modified_object.speed[1] += modified_object.acceleration[1] * config["frequency_updating"] * time_speed
     
-    def coordinates_calculation(self, time_speed: float = 1, config: json = config_display["render"]):
+    def coordinates_calculation_Euler(self, time_speed: float = 1, config: json = config_display["render"]):
         for modified_object in self.planets:
 
             modified_object.coordinates[0] += modified_object.speed[0] * config["frequency_updating"] * time_speed
             modified_object.coordinates[1] += modified_object.speed[1] * config["frequency_updating"] * time_speed
-    
+
+    def planets_move_calculation_Euler(self, time_speed: float, config: json = config_display["render"]):
+        self.acceleration_calculation_Euler()
+        self.speed_calculation_Euler(time_speed = time_speed)
+        self.coordinates_calculation_Euler(time_speed = time_speed)
+
+
     def trace_calculation(self):
         for planet in self.planets:
             planet.trace.append(list(planet.coordinates))
@@ -124,8 +132,8 @@ class OuterSpace:
             coordinates_center_mass[1] += i.coordinates[1] * i.mass
             total_mass += i.mass
         
-        coordinates_center_mass[0] /= total_mass
-        coordinates_center_mass[1] /= total_mass
+        coordinates_center_mass[0] /= not_zero(total_mass)
+        coordinates_center_mass[1] /= not_zero(total_mass)
 
         return coordinates_center_mass
 
@@ -146,12 +154,12 @@ class OuterSpace:
         
         self.planets = planet_system
     
-    def get_normalized_scale(self, center_coordinates: list, multiplier: float = 0.75, config: json = config_display["render"]):
+    def get_normalized_scale(self, center_coordinates: list, config: json = config_display["render"]):
 
         most_remote_planet = self.get_most_remote_planet(center_coordinates)
 
-        return max(abs(center_coordinates[0] - most_remote_planet.coordinates[0]) * 2 / (config["size"]["width"] * multiplier), 
-                   abs(center_coordinates[1] - most_remote_planet.coordinates[1]) * 2 / (config["size"]["height"] * multiplier))
+        return max(abs(center_coordinates[0] - most_remote_planet.coordinates[0]) * 2 / (config["size"]["width"] * config_display["render"]["normal_scale_multiplier"]), 
+                   abs(center_coordinates[1] - most_remote_planet.coordinates[1]) * 2 / (config["size"]["height"] * config_display["render"]["normal_scale_multiplier"]))
 
     def get_most_remote_planet(self, center_coordinates) -> SpaceObject:
         max_distance = 0
