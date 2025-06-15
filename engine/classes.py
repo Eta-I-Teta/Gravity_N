@@ -71,36 +71,42 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
 
 def draw_planet_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
     MultilineText(
-        f"Name: {obj.name} \n" \
-        f"Position: {get_beautiful_number(obj.coordinates[0])}, {get_beautiful_number(obj.coordinates[1])} \n" \
-        f"Speed: {get_beautiful_number(obj.speed[0])}, {get_beautiful_number(obj.speed[1])}",
+        f"Название: {obj.name} \n" \
+        f"Координаты: {get_beautiful_number(obj.coordinates[0])}, {get_beautiful_number(obj.coordinates[1])} \n" \
+        f"Ускорение: {get_beautiful_number(obj.acceleration[0])}, {get_beautiful_number(obj.acceleration[1])} \n" \
+        f"Скорость: {get_beautiful_number(obj.speed[0])}, {get_beautiful_number(obj.speed[1])}",
         font
-    ).draw(screen, get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)[0], get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)[1], 300)
+    ).draw(
+        screen, 
+        get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)[0], 
+        get_coordinates_for_screen(obj.coordinates, scale, camera_shift, center_coordinates)[1], 
+        350
+    )
 
 class OuterSpace:
     def __init__(self, planets: deque = None, center_mass: list = None):
         self.planets = deque() if ( planets == None ) else planets
     
     # Метод Эйлера
-
+    
     def acceleration_calculation_Euler(self, config: json = config_consts):
         G = config["G"]
 
         for modified_object in self.planets:
-            acceleration_data = []
+
+            total_acceleration = [0, 0]
 
             for cursor_object in self.planets:
-                if modified_object != cursor_object:
-                    
-                    direction = [cursor_object.coordinates[0] - modified_object.coordinates[0], cursor_object.coordinates[1] - modified_object.coordinates[1]]
-                    direction = normalize_vector(direction)
+                if cursor_object != modified_object:
+                    value = (G * cursor_object.mass) / ( not_zero( distance(modified_object.coordinates, cursor_object.coordinates) ) ** 2)
+                    direction = normalize_vector([
+                        cursor_object.coordinates[0] - modified_object.coordinates[0],
+                        cursor_object.coordinates[1] - modified_object.coordinates[1]
+                    ])
+                    total_acceleration[0] += value * direction[0]
+                    total_acceleration[1] += value * direction[1]
+            modified_object.acceleration = total_acceleration
 
-                    value = G * cursor_object.mass / not_zero( distance(modified_object.coordinates, cursor_object.coordinates) ** 2 )
-
-                    acceleration_data.append(product_vector_scalar(value, direction))
-            
-            modified_object.acceleration = averaging_vector(acceleration_data)
-    
     def speed_calculation_Euler(self, time_speed: float = 1, config: json = config_display["render"]):
         for modified_object in self.planets:
 

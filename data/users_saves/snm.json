@@ -1,0 +1,18 @@
+{
+    "0": {
+        "name": "Sun",
+        "mass": 1.989e30,
+        "radius": 696340e3,
+        "color": [255, 255, 0],
+        "coordinates": [0, 0],
+        "speed": [0, 0]
+    },
+    "1": {
+        "name": "Earth",
+        "mass": 5.972e24,
+        "radius": 6371e3,
+        "color": [100, 149, 237],
+        "coordinates": [149.6e9, 0],
+        "speed": [0, 29.78e3]
+    }
+}
