@@ -7,7 +7,7 @@ import subprocess
 
 clear_log = lambda: os.system('cls')
 
-def view_save(obj: json):
+def print_json_planet_system(obj: json):
     for planet_name in obj:
         print(f"| {obj[planet_name]['name']}")
         for parameter in obj[planet_name]:
@@ -18,6 +18,7 @@ planet_configuration = json_into_array( read_json_file("data/config/standart_pla
 
 forbidden_names_files_and_planets = [
     "save",
+    "load",
     "delete",
     "main",
     ""
@@ -76,7 +77,7 @@ while True:
             f"----- Файл {selected_file_name} -----\n" \
             "Содержание:"
         )
-        view_save( read_json_file(f"data/user_saves/{selected_file_name}.json") )
+        print_json_planet_system( read_json_file(f"data/user_saves/{selected_file_name}.json") )
         print(
             "-------------\n" \
             "load - Загрузить конфигурацию\n" \
@@ -88,39 +89,14 @@ while True:
         os.remove(f"data/user_saves/{selected_file_name}.json")
 
         input_signal = "main"
-        print("Файл был успешно удалён")
+        print("----- Файл был успешно удалён -----")
         time.sleep(2)
         continue
-        
-
-    # Загрузка сохранений
-
-    elif (page == "main") and (input_signal == "load"):
-        page = "load"
-
-        saves = []
-        for file_name in os.listdir("data/user_saves"):
-            if ".json" in file_name:
-                saves.append(file_name.replace(".json", ""))
-        
-        print(
-            "----- Загрузка сохранённой конфигурации -----\n" \
-            "Список доступных файлов:"
-        )
-        for i in saves:
-            print(f"- {i}")
-        print(
-            "--------------\n" \
-            "Введите название сохранения, чтобы его загрузить\n" \
-            "main - для выхода в главное меню\n" \
-            "--------------"
-        )
-
-    elif (page == "load") and (input_signal in saves):
-        planet_configuration = json_into_array( read_json_file(f"data/user_saves/{input_signal}.json") )
+    elif (page == "selected_file") and (input_signal == "load"):
+        planet_configuration = json_into_array( read_json_file(f"data/user_saves/{selected_file_name}.json") )
 
         input_signal = "main"
-        print("Файл был успешно загружен")
+        print("----- Файл был успешно загружен -----")
         time.sleep(2)
         continue
 
@@ -130,6 +106,11 @@ while True:
         page = "start"
         print(
             "----- Вы уверены, что хотите запустить программу? -----\n" \
+            "Конфигурация запуска:"
+        )
+        print_json_planet_system( list_to_json(planet_configuration) )
+        print(
+            "--------------\n" \
             "start - Да, уверен\n" \
             "main - Нет, вернуться на главную\n" \
             "--------------"
