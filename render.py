@@ -6,10 +6,8 @@ import pygame
 
 pygame.init()
 
-with open("data/config/display.json", "r", encoding="utf-8") as f:
-    config_display = json.load(f)
-with open("data/config/help_info.json", "r", encoding="utf-8") as f:
-    config_help_info = json.load(f)
+config_display = read_json_file("data/config/display.json")
+config_help_info = read_json_file("data/config/help_info.json")
 
 # Screen settings
 
@@ -23,7 +21,7 @@ pygame.display.set_icon(pygame.image.load('data/images/render_icon.png'))
 # Configurate and other settings
 
 space = OuterSpace()
-space.set_planet_system_configuration("data/config/standart_planet_system.json")
+space.set_planet_system_configuration("data/user_saves/latest_configuration.json")
 
 total_time = 0
 time_speed = 1

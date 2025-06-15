@@ -1,46 +1,161 @@
-import pygame
-import json
-import subprocess
 from engine.classes import *
+from engine.utilities import *
+import json
+import time
+import os
+import subprocess
 
-pygame.init()
+clear_log = lambda: os.system('cls')
 
-with open("data/config/display.json", "r", encoding="utf-8") as f:
-    config_display = json.load(f)
+def view_save(obj: json):
+    for planet_name in obj:
+        print(f"| {obj[planet_name]['name']}")
+        for parameter in obj[planet_name]:
+            if parameter != "name":
+                print(f"-| {parameter} : {obj[planet_name][parameter]}")
 
-# Screen settings
+planet_configuration = json_into_array( read_json_file("data/config/standart_planet_system.json") )
 
-screen_width = config_display["main"]["size"]["width"]
-screen_height = config_display["main"]["size"]["height"]
+forbidden_names_files_and_planets = [
+    "save",
+    "delete",
+    "main",
+    ""
+]
 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Задача начальной концигурации")
-pygame.display.set_icon(pygame.image.load('data/images/main_icon.png'))
+input_signal = "main"
+page = "main"
 
-font = pygame.font.SysFont(config_display["main"]["font_family"], config_display["main"]["font_size"])
-
-planet_system_config = OuterSpace().set_planet_system_configuration("data/config/standart_planet_system.json")
-
-
+do_clear = True
 
 while True:
 
-    # Events
+    clear_log()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
-
-    #subprocess.run(["python", "render.py"])
-
-    # Drawing
-
-    screen.fill((0, 0, 0))
+    # Главная и выход
     
+    if input_signal == "main":
+        page = "main"
+        print(
+            "----- Главная -----\n" \
+            "start - Запустить программу\n" \
+            "files - Посмотреть файлы сохранений\n" \
+            "*save *name* - Сохранить конфигурацию\n" \
+            "*edit - Изменить конфигурацию\n" \
+            "exit - Выйти из программы\n" \
+            "--------------"
+        )
+    elif (page == "main") and (input_signal == "exit"):
+        print("Вы вышли из программы")
+        break
+    
+    # Работа с файлами
 
-    pygame.display.flip()
+    elif (page == "main") and (input_signal == "files"):
+        page = "files"
 
-    pygame.time.Clock().tick(config_display["main"]["FPS"])
+        save_files = []
+        for file_name in os.listdir("data/user_saves"):
+            if ".json" in file_name:
+                save_files.append(file_name.replace(".json", ""))
+        
+        print("----- Доступные файлы -----")
+        for i in save_files:
+            print(f"| {i}")
+        print(
+            "--------------\n" \
+            "Введите название файла, чтобы его выбрать\n" \
+            "main - для выхода в главное меню\n" \
+            "--------------"
+        )
+    elif (page == "files") and (input_signal in save_files):
+        page = "selected_file"
+        selected_file_name = input_signal
 
-pygame.quit()
+        print(
+            f"----- Файл {selected_file_name} -----\n" \
+            "Содержание:"
+        )
+        view_save( read_json_file(f"data/user_saves/{selected_file_name}.json") )
+        print(
+            "-------------\n" \
+            "load - Загрузить конфигурацию\n" \
+            "delete - Удалить конфигурацию\n" \
+            "main - Вернуться на главную\n" \
+            "-------------"
+        )
+    elif (page == "selected_file") and (input_signal == "delete"):
+        os.remove(f"data/user_saves/{selected_file_name}.json")
+
+        input_signal = "main"
+        print("Файл был успешно удалён")
+        time.sleep(2)
+        continue
+        
+
+    # Загрузка сохранений
+
+    elif (page == "main") and (input_signal == "load"):
+        page = "load"
+
+        saves = []
+        for file_name in os.listdir("data/user_saves"):
+            if ".json" in file_name:
+                saves.append(file_name.replace(".json", ""))
+        
+        print(
+            "----- Загрузка сохранённой конфигурации -----\n" \
+            "Список доступных файлов:"
+        )
+        for i in saves:
+            print(f"- {i}")
+        print(
+            "--------------\n" \
+            "Введите название сохранения, чтобы его загрузить\n" \
+            "main - для выхода в главное меню\n" \
+            "--------------"
+        )
+
+    elif (page == "load") and (input_signal in saves):
+        planet_configuration = json_into_array( read_json_file(f"data/user_saves/{input_signal}.json") )
+
+        input_signal = "main"
+        print("Файл был успешно загружен")
+        time.sleep(2)
+        continue
+
+    # Запуск рендера
+
+    elif (page == "main") and (input_signal == "start"):
+        page = "start"
+        print(
+            "----- Вы уверены, что хотите запустить программу? -----\n" \
+            "start - Да, уверен\n" \
+            "main - Нет, вернуться на главную\n" \
+            "--------------"
+        )
+    elif (page == "start") and (input_signal == "start"):
+        
+        save_json_file(
+            list_to_json(planet_configuration),
+            "data/user_saves/latest_configuration.json"
+        )
+        subprocess.run(["python", "render.py"])
+
+        print("Программа запущена")
+        break
+    
+    # Ошибка о нераспознанной команде
+
+    else:
+        print(
+            "----- Ошибка ввода -----\n" \
+            f"Программа не опознаёт введённую команду *{input_signal}*, пожалуйста попробуйте снова\n" \
+            "Если вы заблудились - введите *main*, чтобы вернуться на главную\n" \
+            "--------------"
+        )
+
+    # Ввод команды
+
+    input_signal = input("Выполнить: ")
+    

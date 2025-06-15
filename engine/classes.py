@@ -4,12 +4,9 @@ from engine.utilities import *
 from collections import deque
 from engine.GUI import *
 
-with open("data/config/display.json", "r", encoding="utf-8") as f:
-    config_display = json.load(f)
-with open("data/config/consts.json", "r", encoding="utf-8") as f:
-    config_consts = json.load(f)
-with open("data/config/backend_settings.json", "r", encoding="utf-8") as f:
-    config_backend_settings = json.load(f)
+config_display = read_json_file("data/config/display.json")
+config_consts = read_json_file("data/config/consts.json")
+config_backend_settings = read_json_file("data/config/backend_settings.json")
 
 class SpaceObject:
     def __init__(self, name: any = None, mass: float = None, coordinates: list = None, radius: float = None, speed: list = None, acceleration: list = None, color = None, config = config_display["render"]):
@@ -124,6 +121,7 @@ class OuterSpace:
         self.speed_calculation_Euler(time_speed = time_speed)
         self.coordinates_calculation_Euler(time_speed = time_speed)
 
+    # Остальное
 
     def trace_calculation(self):
         for planet in self.planets:

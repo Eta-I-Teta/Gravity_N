@@ -11,8 +11,8 @@
         "max_time_speed": 1e9,
 
         "frequency_updating": 1e-2,
-        "camera_movement_speed": 7,
-        "scale_multiplier": 1.25,
+        "camera_movement_speed": 10,
+        "scale_multiplier": 1.15,
         "normal_scale_multiplier": 0.75,
 
         "trace_lenght": 1000,

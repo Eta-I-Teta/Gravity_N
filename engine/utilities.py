@@ -176,3 +176,24 @@ def get_beautiful_number(num: int) -> str:
     num = round(num, 6)
 
     return str(sgn * num) + f"e{k}"
+
+def list_to_json(array: list) -> json:
+    j = {}
+    for index in range(len(array)):
+        j[str(index)] = array[index]
+    return j
+
+def read_json_file(way: str) -> json:
+    with open(way, "r", encoding="utf-8") as f:
+        json_file = json.load(f)
+    return json_file
+
+def save_json_file(obj: json, way: str):
+    with open(way, "w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=4, ensure_ascii=False)
+
+def json_into_array(obj: json) -> list:
+    arr = []
+    for i in obj:
+        arr.append(obj[i])
+    return arr

@@ -1,8 +1,8 @@
+from engine.utilities import *
 import pygame
 import json
 
-with open("data/config/GUI.json", "r", encoding="utf-8") as f:
-    config_GUI = json.load(f)
+config_GUI = read_json_file("data/config/GUI.json")
 
 class Button():
     def __init__(self, x_pos: int, y_pos: int, width: int, height: int, text: str, color: list, action, font):
