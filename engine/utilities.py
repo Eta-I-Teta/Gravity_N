@@ -128,39 +128,43 @@ def averaging_vector(data: list) -> list:
     return average_vector
 
 def not_zero(num: int):
-    return max(1e-18, num)
+    if num >= 0: sgn = 1
+    else: sgn = -1
+    return sgn * max(1e-18, abs(num))
 
 def time_converter(num: int) -> str:
     century = 0
-    while num > 60*60*24*365*100:
+    while num >= 60*60*24*365*100:
         num -= 60*60*24*365*100
         century += 1
 
     year = 0
-    while num > 60*60*24*365:
+    while num >= 60*60*24*365:
         num -= 60*60*24*365
         year += 1
 
     day = 0
-    while num > 60*60*24:
+    while num >= 60*60*24:
         num -= 60*60*24
         day += 1
 
     hour = 0
-    while num > 60*60:
+    while num >= 60*60:
         num -= 60*60
         hour += 1
 
     minute = 0
-    while num > 60:
+    while num >= 60:
         num -= 60
         minute += 1
-    second = round(num, 3)
+    second = float(round(num, 3))
 
     return f"{century} в. {year} лет {day} д. {hour} ч. {minute} мин. {second} с."
 
 def get_beautiful_number(num: int) -> str:
-    if num == abs(num):
+    if num == 0:
+        return "0.0e0"
+    elif num == abs(num):
         sgn = 1
     else:
         num = abs(num)
@@ -170,7 +174,7 @@ def get_beautiful_number(num: int) -> str:
     while num < 1:
         num *= 10
         k -=1
-    while num >= 10:
+    while round(num, 6) >= 10:
         num /= 10
         k+=1
     
@@ -193,13 +197,13 @@ def save_json_file(obj: json, way: str):
     with open(way, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=4, ensure_ascii=False)
 
+# main
+
 def json_to_list(obj: json) -> list:
     arr = []
     for i in obj:
         arr.append(obj[i])
     return arr
-
-# main
 
 clear_log = lambda: os.system('cls')
 

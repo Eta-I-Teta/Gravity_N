@@ -66,7 +66,7 @@ def draw_trace(obj: list, screen, center_coordinates: list, camera_shift: list, 
 
         pygame.draw.circle(screen, config["trace_color"], coordinates_for_screen, config["trace_size"])
 
-def draw_planet_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates, config = config_display["render"]):
+def draw_planet_info(obj: SpaceObject, screen, font, scale, camera_shift, center_coordinates):
     MultilineText(
         f"Название: {obj.name} \n" \
         f"Координаты: {get_beautiful_number(obj.coordinates[0])}, {get_beautiful_number(obj.coordinates[1])} \n" \

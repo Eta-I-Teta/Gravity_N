@@ -156,7 +156,7 @@ while True:
         f"Скорость времени: {get_beautiful_number(time_speed)}x \n" \
         f"Отслеживаемый объект: {anchor_name}",
         font
-        ).draw(screen, 0, 0, 475)
+        ).draw(screen, 0, 0, 500)
 
     if show_help:
         MultilineText(
