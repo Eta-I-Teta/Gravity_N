@@ -162,8 +162,10 @@ class OuterSpace:
 
         most_remote_planet = self.get_most_remote_planet(center_coordinates)
 
-        return max(abs(center_coordinates[0] - most_remote_planet.coordinates[0]) * 2 / (config["size"]["width"] * config_display["render"]["normal_scale_multiplier"]), 
-                   abs(center_coordinates[1] - most_remote_planet.coordinates[1]) * 2 / (config["size"]["height"] * config_display["render"]["normal_scale_multiplier"]))
+        return max(
+            abs(center_coordinates[0] - most_remote_planet.coordinates[0]) * 2 / (config["size"]["width"] * config_display["render"]["normal_scale_multiplier"]), 
+            abs(center_coordinates[1] - most_remote_planet.coordinates[1]) * 2 / (config["size"]["height"] * config_display["render"]["normal_scale_multiplier"])
+        )
 
     def get_most_remote_planet(self, center_coordinates) -> SpaceObject:
         max_distance = 0

@@ -1,4 +1,5 @@
 import json
+import os
 
 with open("data/config/consts.json", "r", encoding="utf-8") as f:
     config_consts = json.load(f)
@@ -192,8 +193,75 @@ def save_json_file(obj: json, way: str):
     with open(way, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=4, ensure_ascii=False)
 
-def json_into_array(obj: json) -> list:
+def json_to_list(obj: json) -> list:
     arr = []
     for i in obj:
         arr.append(obj[i])
     return arr
+
+# main
+
+clear_log = lambda: os.system('cls')
+
+def check_for_forbidden_names(name: str, forbidden_names = config_backend_settings["forbidden_names"]) -> bool:
+    return name in forbidden_names
+
+def check_for_forbidden_symbols(name: str, forbidden_symbols = config_backend_settings["forbidden_symbols"]) -> bool:
+    check = False
+    for symbol in forbidden_symbols:
+        if symbol in name:
+            check = True
+            break
+    return check
+
+def print_json_object_configuration(obj: json):
+    print(f"| {obj['name']}")
+    for parameter in obj:
+        if parameter != "name":
+            print(f"-| {parameter} : {obj[parameter]}")
+
+def print_json_system_configuration(obj: json):
+    for object_name in obj:
+        print_json_object_configuration(obj[object_name])
+
+def choose_planet_from_system(arr: list, name: str):
+    for planet in arr:
+        if planet["name"] == name:
+            return planet
+
+def delete_planet_from_system(arr: list, name: str):
+    for index in range(len(arr)):
+        if arr[index]["name"] == name:
+            del arr[index]
+            break
+
+def check_object_in_system(arr: list, name: str):
+    for object in arr:
+        if object["name"] == name: return True
+    return False
+
+def index_into_system_by_name(arr: list, name: str) -> int:
+    for index in range(len(arr)):
+        if arr[index]["name"] == name:
+            return index
+    return 0
+
+def get_correct_input_data(data: str):
+    for delete_symbol in "[],()":
+        data = data.replace(delete_symbol, "")
+    if " " in data:
+        data = data.split(" ")
+        for index in range(len(data)):
+            data[index] = float(data[index])
+    else:
+        data = float(data)
+    return data
+
+def check_correct_value_rgb(arr: list) -> bool:
+    if len(arr) != 3:
+        return False
+    else:
+        for color in arr:
+            if (color > 255) or (color < 0):
+                return False
+        return True

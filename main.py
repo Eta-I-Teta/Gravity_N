@@ -5,37 +5,6 @@ import time
 import os
 import subprocess
 
-clear_log = lambda: os.system('cls')
-
-def print_json_system_configuration(obj: json):
-    for object_name in obj:
-        print(f"| {obj[object_name]['name']}")
-        for parameter in obj[object_name]:
-            if parameter != "name":
-                print(f"-| {parameter} : {obj[object_name][parameter]}")
-
-forbidden_names = [
-    "save",
-    "load",
-    "delete",
-    "main",
-    "error_uncknow_command",
-    "error_forbidden_name",
-    "error_forbidden_symbol",
-    ""
-]
-forbidden_symbols = ['.', ',', '<', '>', ':', '"', "'", '/', '\\', '|', '?', '*']
-
-def check_for_forbidden_names(name: str, forbidden_names = forbidden_names) -> bool:
-    return name in forbidden_names
-def check_for_forbidden_symbols(name: str, forbidden_symbols = forbidden_symbols) -> bool:
-    check = False
-    for symbol in forbidden_symbols:
-        if symbol in name:
-            check = True
-            break
-    return check
-
 system_configuration = json_to_list( read_json_file("data/config/standart_planet_system.json") )
 object_attributes = read_json_file("data/config/backend_settings.json")["SpaceObject_attributes"]
 
@@ -57,8 +26,6 @@ while True:
             "start - Запустить программу\n" \
             "files - Посмотреть файлы сохранений\n" \
             "config - Открыть текущую конфигурацию\n" \
-            "*save *name* - Сохранить конфигурацию\n" \
-            "*edit - Изменить конфигурацию\n" \
             "exit - Выйти из программы\n" \
             "--------------"
         )
@@ -158,13 +125,136 @@ while True:
             "main - Вернуться на главную\n" \
             "-------------"
         )
-    elif (page == "config") and (input_signal[:4] == "edit") and (len(input_signal) > 4):
-        print("----- Изменение параметров объекта -----")
-    elif (page == "config") and (input_signal[:6] == "create") and (len(input_signal) > 6):
-        pass
-    elif (page == "config") and (input_signal[:6] == "delete") and (len(input_signal) > 6):
-        pass
-    elif (page == "config") and (input_signal[:7] == "save_as") and (len(input_signal) > 7):
+    elif (page == "config") and (input_signal[:5] == "edit ") and (len(input_signal) > 5):
+        input_signal = input_signal.replace("edit ", "")
+
+        if not check_object_in_system(system_configuration, input_signal):
+            input_signal = "error_invalid_object_name"
+            continue
+        
+        modified_object = system_configuration[index_into_system_by_name(system_configuration, input_signal)]
+
+        print(
+            f"----- Изменение объекта {input_signal} -----\n" \
+            "Старая информация об объекте:"
+        )
+        print_json_object_configuration(modified_object)
+        print(
+            "-------------\n" \
+            "Стоит обратить внимание, что ввод нескольких чисел осуществляется через пробел\n" \
+            "Новые данные:"
+        )
+
+        input_data = input("| (назвение)")
+        if check_for_forbidden_names(input_signal):
+            input_signal = "error_forbidden_name"
+            continue
+        if check_for_forbidden_symbols(input_signal):
+            input_signal = "error_forbidden_symbol"
+            continue
+        if check_object_in_system(system_configuration, input_signal) and (input_data != input_signal):
+            input_signal = "error_invalid_object_name"
+            continue
+        modified_object["name"] = input_data
+
+        input_data = input("-| mass : ")
+        try:
+            input_data = get_correct_input_data(input_data)
+            if not type(input_data) is float:
+                input_signal = "error_incorrect_data_type"
+                continue
+            modified_object["mass"] = input_data
+        except:
+            input_signal = "error_incorrect_data_type"
+            continue
+
+        input_data = input("-| radius : ")
+        try:
+            input_data = get_correct_input_data(input_data)
+            if (not type(input_data) is float) or (input_data < 1):
+                input_signal = "error_incorrect_data_type"
+                continue
+            modified_object["radius"] = input_data
+        except:
+            input_signal = "error_incorrect_data_type"
+            continue
+        
+        input_data = input("-| color : ")
+        try:
+            input_data = get_correct_input_data(input_data)
+            if (not type(input_data) is list) or (len(input_data) != 3) or (not check_correct_value_rgb(input_data)):
+                input_signal = "error_incorrect_data_type"
+                continue
+            modified_object["color"] = input_data
+        except:
+            input_signal = "error_incorrect_data_type"
+            continue
+        
+        input_data = input("-| coordinates : ")
+        try:
+            input_data = get_correct_input_data(input_data)
+            if (not type(input_data) is list) or (len(input_data) != 2):
+                input_signal = "error_incorrect_data_type"
+                continue
+            modified_object["coordinates"] = input_data
+        except:
+            input_signal = "error_incorrect_data_type"
+            continue
+        
+        input_data = input("-| speed : ")
+        try:
+            input_data = get_correct_input_data(input_data)
+            if (not type(input_data) is list) or (len(input_data) != 2):
+                input_signal = "error_incorrect_data_type"
+                continue
+            modified_object["speed"] = input_data
+        except:
+            input_signal = "error_incorrect_data_type"
+            continue
+        
+        page = "main"
+        input_signal = "config"
+        continue
+    elif (page == "config") and (input_signal[:7] == "create ") and (len(input_signal) > 7):
+        input_signal = input_signal.replace("create ", "")
+        if check_for_forbidden_names(input_signal):
+            input_signal = "error_forbidden_name"
+            continue
+        if check_for_forbidden_symbols(input_signal):
+            input_signal = "error_forbidden_symbol"
+            continue
+        if check_object_in_system(system_configuration, input_signal):
+            input_signal = "error_invalid_object_name"
+            continue
+
+        system_configuration.append({
+            "name": input_signal,
+            "mass": 0,
+            "radius": 1,
+            "color": [100, 100, 100],
+            "coordinates": [0, 0],
+            "speed": [0, 0]
+        })
+
+        page = "main"
+        input_signal = "config"
+        continue
+    elif (page == "config") and (input_signal[:7] == "delete ") and (len(input_signal) > 7):
+        input_signal = input_signal.replace("delete ", "")
+
+        if len(system_configuration) == 2:
+            input_signal = "error_min_number_of_planets"
+            continue
+        if not check_object_in_system(system_configuration, input_signal):
+            input_signal = "error_invalid_object_name"
+            continue
+
+        delete_planet_from_system(system_configuration, input_signal)
+
+        page = "main"
+        input_signal = "config"
+        continue
+    elif (page == "config") and (input_signal[:8] == "save_as ") and (len(input_signal) > 8):
         input_signal = input_signal.replace('save_as ', '')
 
         if check_for_forbidden_names(input_signal):
@@ -195,18 +285,40 @@ while True:
         )
     elif input_signal == "error_forbidden_name":
         print(
-            "----- Ошибка имени файла -----\n" \
-            "Недопустимое имя файла, пожалуйста попробуйте снова\n" \
+            "----- Ошибка (недопустимое название) -----\n" \
+            "Недопустимое название, пожалуйста попробуйте снова\n" \
             "Если вы заблудились - введите *main*, чтобы вернуться на главную\n" \
             "--------------"
         )
     elif input_signal == "error_forbidden_symbol":
         print(
-            "----- Ошибка имени файла -----\n" \
-            f"Вы использовали недопустимые символы ({forbidden_symbols}), пожалуйста попробуйте снова\n" \
+            "----- Ошибка (недопустимый символ) -----\n" \
+            f"Вы использовали недопустимые символы ({read_json_file('data/config/backend_settings.json')['forbidden_symbols']}), пожалуйста попробуйте снова\n" \
             "Если вы заблудились - введите *main*, чтобы вернуться на главную\n" \
             "--------------"
         )
+    elif input_signal == "error_min_number_of_planets":
+        print(
+            "----- Ошибка (достигнуто минимальное количество объектов) -----\n" \
+            "Нельзя создать конфигурацию с <2 планет\n" \
+            "Если вы заблудились - введите *main*, чтобы вернуться на главную\n" \
+            "--------------"
+        )
+    elif input_signal == "error_invalid_object_name":
+        print(
+            "----- Ошибка (некорректное имя объекта) -----\n" \
+            "Невозможно обработать имя данного объекта, пожалуйста попробуйте снова\n" \
+            "Если вы заблудились - введите *main*, чтобы вернуться на главную\n" \
+            "--------------"
+        )
+    elif input_signal == "error_incorrect_data_type":
+        print(
+            "----- Ошибка (некорректное вид вводимых данных) -----\n" \
+            "Неправильный формат вводимых данных\n" \
+            "Если вы заблудились - введите *main*, чтобы вернуться на главную\n" \
+            "--------------"
+        )
+    
 
     # Ошибка о нераспознанной команде
 

@@ -1,3 +1,14 @@
 {
-    "SpaceObject_attributes": ["name", "mass", "radius", "color", "coordinates", "speed"]
+    "SpaceObject_attributes": ["name", "mass", "radius", "color", "coordinates", "speed"],
+    "forbidden_names": [
+        "save",
+        "load",
+        "delete",
+        "main",
+        "error_uncknow_command",
+        "error_forbidden_name",
+        "error_forbidden_symbol",
+        ""
+    ],
+    "forbidden_symbols": [".", ",", "<", ">", ":", "'", "/", "\\", "|", "?", "*"]
 }
